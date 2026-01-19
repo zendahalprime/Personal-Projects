@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belgium Mortgage Calculator</title>
+    <style>
+        :root {
+            --color-bg-primary: #fcfcf9;
+            --color-bg-secondary: #fffffe;
+            --color-text: #134252;
+            --color-text-secondary: #626c71;
+            --color-primary: #208c8d;
+            --color-primary-hover: #1b7476;
+            --color-border: #5e5240;
+            --color-success: #208c8d;
+            --color-warning: #a84b2f;
+            --color-error: #c01527;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: var(--font-family);
+            color: var(--color-text);
+            background: var(--color-bg-primary);
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--color-bg-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .subtitle {
+            color: var(--color-text-secondary);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section {
+            background: #f5f5f5;
+            border: 1px solid rgba(94, 82, 64, 0.12);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            color: var(--color-text);
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--color-text);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(94, 82, 64, 0.2);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: var(--font-family);
+            background: var(--color-bg-secondary);
+            color: var(--color-text);
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(32, 140, 141, 0.1);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .input-unit {
+            padding: 10px 12px;
+            background: #e8e8e8;
+            border: 1px solid rgba(94, 82, 64, 0.2);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        button {
+            background: var(--color-primary);
+            color: #fcfcf9;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: var(--color-primary-hover);
+            box-shadow: 0 2px 8px rgba(32, 140, 141, 0.2);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid rgba(94, 82, 64, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .summary-value.success {
+            color: var(--color-success);
+        }
+
+        .summary-value.warning {
+            color: var(--color-warning);
+        }
+
+        .summary-value.error {
+            color: var(--color-error);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(94, 82, 64, 0.1);
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin: 0;
+            width: auto;
+            transition: all 0.2s;
+        }
+
+        .tab-button:hover {
+            color: var(--color-text);
+            box-shadow: none;
+            background: none;
+        }
+
+        .tab-button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        th {
+            background: rgba(32, 140, 141, 0.08);
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-text);
+            border-bottom: 2px solid var(--color-primary);
+        }
+
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(94, 82, 64, 0.08);
+        }
+
+        tr:hover {
+            background: rgba(32, 140, 141, 0.04);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-bold {
+            font-weight: 600;
+        }
+
+        .debt-ratio {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .debt-ratio.good {
+            background: rgba(32, 140, 141, 0.15);
+            color: var(--color-success);
+        }
+
+        .debt-ratio.caution {
+            background: rgba(168, 75, 47, 0.15);
+            color: var(--color-warning);
+        }
+
+        .debt-ratio.danger {
+            background: rgba(192, 21, 47, 0.15);
+            color: var(--color-error);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-secondary);
+            font-style: italic;
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .acquisition-breakdown {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: var(--color-bg-secondary);
+            border-radius: 4px;
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .cost-item-label {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .cost-item-value {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .total-cost-item {
+            border-left-color: var(--color-warning);
+            background: rgba(168, 75, 47, 0.05);
+            font-weight: 600;
+        }
+
+        .total-cost-item .cost-item-value {
+            color: var(--color-warning);
+            font-size: 15px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .metric-box {
+            background: var(--color-bg-secondary);
+            border: 1px solid rgba(94, 82, 64, 0.1);
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: 4px;
+        }
+
+        .metric-note {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .info-box {
+            background: rgba(32, 140, 141, 0.08);
+            border-left: 4px solid var(--color-primary);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .warning-box {
+            background: rgba(168, 75, 47, 0.08);
+            border-left: 4px solid var(--color-warning);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .scroll-container {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .highlight-row {
+            background: rgba(32, 140, 141, 0.1) !important;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Belgium Mortgage Calculator</h1>
+        <p class="subtitle">Complete financial analysis for property purchases in Flanders (Leuven region)</p>
+
+        <div class="layout">
+            <!-- Left Panel: Input Form -->
+            <div>
+                <div class="section">
+                    <div class="section-title">Property & Loan Details</div>
+
+                    <div class="form-group">
+                        <label for="housePrice">House Purchase Price (€)</label>
+                        <input type="number" id="housePrice" value="600000" min="50000" step="10000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="downPaymentPct">Down Payment (%)</label>
+                        <input type="number" id="downPaymentPct" value="10" min="5" max="50" step="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interestRate">Interest Rate (% per year)</label>
+                        <input type="number" id="interestRate" value="3.5" min="1" max="10" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mortgageTerm">Mortgage Term (years)</label>
+                        <input type="number" id="mortgageTerm" value="20" min="5" max="40" step="1">
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 20px;">
+                    <div class="section-title">Additional Costs & Income</div>
+
+                    <div class="form-group">
+                        <label for="monthlyFixedCosts">Monthly Fixed Costs (€) *</label>
+                        <input type="number" id="monthlyFixedCosts" value="0" min="0" step="50">
+                        <small style="color: var(--color-text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                            Other debts, insurance, utilities, maintenance reserves, etc.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="annualGrossIncome">Annual Gross Income (€)</label>
+                        <input type="number" id="annualGrossIncome" value="100000" min="10000" step="5000">
+                        <small style="color: var(--color-text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                            For debt service ratio calculation
+                        </small>
+                    </div>
+                </div>
+
+                <button onclick="calculateAll()">📊 Calculate</button>
+            </div>
+
+            <!-- Right Panel: Summary -->
+            <div id="summaryPanel">
+                <div class="section">
+                    <div class="section-title">📌 Quick Summary</div>
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <div class="summary-label">Initial Outlay</div>
+                            <div class="summary-value" id="totalInitial">€0</div>
+                            <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Down payment + costs</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Total Interest (20yr)</div>
+                            <div class="summary-value" id="totalInterest">€0</div>
+                            <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Over loan term</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(94, 82, 64, 0.1);">
+                        <div style="font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 10px;">📊 Fixed Payment Method</div>
+                        <div class="summary-grid">
+                            <div class="summary-card">
+                                <div class="summary-label">Monthly Payment</div>
+                                <div class="summary-value success" id="monthlyPaymentFixed">€0</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Equal payment</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-label">GDS Ratio</div>
+                                <div class="summary-value" id="gdsRatioFixed">0%</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Target: &lt;40%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(94, 82, 64, 0.1);">
+                        <div style="font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 10px;">📋 Fixed Principal Method</div>
+                        <div class="summary-grid">
+                            <div class="summary-card">
+                                <div class="summary-label">First Payment</div>
+                                <div class="summary-value success" id="monthlyPaymentPrincipalFirst">€0</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Decreasing over time</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-label">GDS Ratio (Month 1)</div>
+                                <div class="summary-value" id="gdsRatioPrincipalFirst">0%</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Improves monthly</div>
+                            </div>
+                        </div>
+                        <div class="summary-grid" style="margin-top: 10px;">
+                            <div class="summary-card">
+                                <div class="summary-label">Last Payment</div>
+                                <div class="summary-value success" id="monthlyPaymentPrincipalLast">€0</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Lowest payment</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-label">GDS Ratio (Last Month)</div>
+                                <div class="summary-value" id="gdsRatioPrincipalLast">0%</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Best affordability</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 20px;">
+                    <div class="section-title">💰 Acquisition Costs Breakdown</div>
+                    <div id="acquisitionCosts" class="acquisition-breakdown">
+                        <div class="no-data">Click Calculate to see breakdown</div>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 20px;">
+                    <div class="section-title">📈 Key Metrics</div>
+                    <div class="metrics-grid">
+                        <div class="metric-box">
+                            <div class="metric-label">Loan Amount</div>
+                            <div class="metric-value" id="loanAmount">€0</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">LTV Ratio</div>
+                            <div class="metric-value" id="ltvRatio">0%</div>
+                            <div class="metric-note">Target: &lt;90%</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Total Debt Service</div>
+                            <div class="metric-value" id="totalDebtService">€0</div>
+                            <div class="metric-note">Annual cost</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">TDS Ratio</div>
+                            <div class="metric-value" id="tdsRatio">0%</div>
+                            <div class="metric-note">Target: &lt;40%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('fixed-payment')">📊 Fixed Payment Method</button>
+                <button class="tab-button" onclick="switchTab('fixed-principal')">📋 Fixed Principal Method</button>
+                <button class="tab-button" onclick="switchTab('analysis')">📈 Financial Analysis</button>
+            </div>
+
+            <!-- Fixed Payment Tab -->
+            <div id="fixed-payment" class="tab-content active">
+                <div class="section">
+                    <div class="section-title">Fixed Payment Amortization Schedule</div>
+                    <p style="color: var(--color-text-secondary); font-size: 13px; margin-bottom: 15px;">
+                        Standard mortgage method: Equal payment every month, but interest vs. principal split changes over time.
+                    </p>
+                    <div id="fixedPaymentInfo" class="info-box"></div>
+                    <div class="scroll-container">
+                        <table id="fixedPaymentTable">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th class="text-right">Payment (€)</th>
+                                    <th class="text-right">Principal (€)</th>
+                                    <th class="text-right">Interest (€)</th>
+                                    <th class="text-right">Remaining (€)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fixedPaymentBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fixed Principal Tab -->
+            <div id="fixed-principal" class="tab-content">
+                <div class="section">
+                    <div class="section-title">Fixed Principal Amortization Schedule</div>
+                    <p style="color: var(--color-text-secondary); font-size: 13px; margin-bottom: 15px;">
+                        Alternative method: Fixed principal every month, but total payment decreases over time as interest declines.
+                    </p>
+                    <div id="fixedPrincipalInfo" class="info-box"></div>
+                    <div class="scroll-container">
+                        <table id="fixedPrincipalTable">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th class="text-right">Payment (€)</th>
+                                    <th class="text-right">Principal (€)</th>
+                                    <th class="text-right">Interest (€)</th>
+                                    <th class="text-right">Remaining (€)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fixedPrincipalBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Tab -->
+            <div id="analysis" class="tab-content">
+                <div class="section">
+                    <div class="section-title">📊 Debt Service Ratio Analysis</div>
+                    <div id="debtServiceAnalysis"></div>
+                </div>
+
+                <div class="section" style="margin-top: 20px;">
+                    <div class="section-title">⚠️ Key Insights</div>
+                    <div id="insights"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(value) {
+            return '€' + value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function formatCurrencyShort(value) {
+            if (value >= 1000000) return '€' + (value / 1000000).toFixed(2) + 'M';
+            if (value >= 1000) return '€' + (value / 1000).toFixed(1) + 'k';
+            return '€' + value.toFixed(0);
+        }
+
+        function calculateAll() {
+            const housePrice = parseFloat(document.getElementById('housePrice').value);
+            const downPaymentPct = parseFloat(document.getElementById('downPaymentPct').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value);
+            const mortgageTerm = parseFloat(document.getElementById('mortgageTerm').value);
+            const monthlyFixedCosts = parseFloat(document.getElementById('monthlyFixedCosts').value);
+            const annualGrossIncome = parseFloat(document.getElementById('annualGrossIncome').value);
+
+            // Calculate down payment and loan
+            const downPaymentAmount = housePrice * (downPaymentPct / 100);
+            const loanAmount = housePrice - downPaymentAmount;
+
+            // Calculate acquisition costs
+            const registrationTax = housePrice * 0.02; // Flanders first home
+            const notaryFees = housePrice * 0.009;
+            const mortgageReg = loanAmount * 0.01;
+            const mortgageDuty = loanAmount * 0.003;
+            const epcSearches = 375;
+            const appraisalAdmin = 700;
+            const totalAcquisitionCosts = registrationTax + notaryFees + mortgageReg + mortgageDuty + epcSearches + appraisalAdmin;
+            const totalInitialInvestment = downPaymentAmount + totalAcquisitionCosts;
+
+            // Store in global for tab functions
+            window.calcData = {
+                housePrice,
+                downPaymentAmount,
+                loanAmount,
+                interestRate,
+                mortgageTerm,
+                monthlyFixedCosts,
+                annualGrossIncome,
+                registrationTax,
+                notaryFees,
+                mortgageReg,
+                mortgageDuty,
+                epcSearches,
+                appraisalAdmin,
+                totalAcquisitionCosts,
+                totalInitialInvestment
+            };
+
+            // Calculate fixed payment
+            const monthlyRate = interestRate / 100 / 12;
+            const numPayments = mortgageTerm * 12;
+            const monthlyPayment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+            const totalPaid = monthlyPayment * numPayments;
+            const totalInterest = totalPaid - loanAmount;
+
+            // Calculate fixed principal method values
+            const fixedPrincipal = loanAmount / numPayments;
+            const firstMonthPaymentPrincipal = fixedPrincipal + (loanAmount * monthlyRate);
+            const lastMonthPaymentPrincipal = fixedPrincipal + (fixedPrincipal * monthlyRate);
+
+            // Update summary
+            document.getElementById('totalInitial').textContent = formatCurrency(totalInitialInvestment);
+            document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+
+            // Fixed Payment Method
+            document.getElementById('monthlyPaymentFixed').textContent = formatCurrency(monthlyPayment);
+            
+            // Fixed Principal Method
+            document.getElementById('monthlyPaymentPrincipalFirst').textContent = formatCurrency(firstMonthPaymentPrincipal);
+            document.getElementById('monthlyPaymentPrincipalLast').textContent = formatCurrency(lastMonthPaymentPrincipal);
+
+            // Debt service ratios
+            const monthlyGrossIncome = annualGrossIncome / 12;
+            const gdsRatioFixed = ((monthlyPayment + monthlyFixedCosts) / monthlyGrossIncome) * 100;
+            const gdsRatioPrincipalFirst = ((firstMonthPaymentPrincipal + monthlyFixedCosts) / monthlyGrossIncome) * 100;
+            const gdsRatioPrincipalLast = ((lastMonthPaymentPrincipal + monthlyFixedCosts) / monthlyGrossIncome) * 100;
+            
+            // Update GDS displays
+            document.getElementById('gdsRatioFixed').textContent = gdsRatioFixed.toFixed(1) + '%';
+            if (gdsRatioFixed > 40) {
+                document.getElementById('gdsRatioFixed').className = 'summary-value error';
+            } else if (gdsRatioFixed > 33) {
+                document.getElementById('gdsRatioFixed').className = 'summary-value warning';
+            } else {
+                document.getElementById('gdsRatioFixed').className = 'summary-value success';
+            }
+
+            document.getElementById('gdsRatioPrincipalFirst').textContent = gdsRatioPrincipalFirst.toFixed(1) + '%';
+            if (gdsRatioPrincipalFirst > 40) {
+                document.getElementById('gdsRatioPrincipalFirst').className = 'summary-value error';
+            } else if (gdsRatioPrincipalFirst > 33) {
+                document.getElementById('gdsRatioPrincipalFirst').className = 'summary-value warning';
+            } else {
+                document.getElementById('gdsRatioPrincipalFirst').className = 'summary-value success';
+            }
+
+            document.getElementById('gdsRatioPrincipalLast').textContent = gdsRatioPrincipalLast.toFixed(1) + '%';
+            if (gdsRatioPrincipalLast > 40) {
+                document.getElementById('gdsRatioPrincipalLast').className = 'summary-value error';
+            } else if (gdsRatioPrincipalLast > 33) {
+                document.getElementById('gdsRatioPrincipalLast').className = 'summary-value warning';
+            } else {
+                document.getElementById('gdsRatioPrincipalLast').className = 'summary-value success';
+            }
+
+            // Acquisition costs breakdown
+            const costBreakdown = `
+                <div class="cost-item">
+                    <span class="cost-item-label">Down Payment (${downPaymentPct}%)</span>
+                    <span class="cost-item-value">${formatCurrency(downPaymentAmount)}</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-item-label">Registration Tax (2%)</span>
+                    <span class="cost-item-value">${formatCurrency(registrationTax)}</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-item-label">Notary Fees (0.9%)</span>
+                    <span class="cost-item-value">${formatCurrency(notaryFees)}</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-item-label">Mortgage Registration (1%)</span>
+                    <span class="cost-item-value">${formatCurrency(mortgageReg)}</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-item-label">Mortgage Duty (0.3%)</span>
+                    <span class="cost-item-value">${formatCurrency(mortgageDuty)}</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-item-label">EPC & Searches</span>
+                    <span class="cost-item-value">${formatCurrency(epcSearches)}</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-item-label">Appraisal & Admin</span>
+                    <span class="cost-item-value">${formatCurrency(appraisalAdmin)}</span>
+                </div>
+                <div class="cost-item total-cost-item">
+                    <span class="cost-item-label">Total Initial Investment</span>
+                    <span class="cost-item-value">${formatCurrency(totalInitialInvestment)}</span>
+                </div>
+            `;
+            document.getElementById('acquisitionCosts').innerHTML = costBreakdown;
+
+            // Key metrics
+            document.getElementById('loanAmount').textContent = formatCurrencyShort(loanAmount);
+            document.getElementById('ltvRatio').textContent = ((loanAmount / housePrice) * 100).toFixed(1) + '%';
+            document.getElementById('totalDebtService').textContent = formatCurrencyShort(monthlyPayment * 12);
+            document.getElementById('tdsRatio').textContent = tdsRatio.toFixed(1) + '%';
+            
+            // Show results section
+            document.getElementById('resultsSection').style.display = 'block';
+
+            // Generate amortization tables
+            generateFixedPaymentSchedule(loanAmount, monthlyRate, numPayments, monthlyPayment);
+            generateFixedPrincipalSchedule(loanAmount, monthlyRate, numPayments);
+            generateAnalysis(monthlyPayment, monthlyGrossIncome, gdsRatio, tdsRatio, monthlyFixedCosts, totalInterest, loanAmount);
+        }
+
+        function generateFixedPaymentSchedule(loanAmount, monthlyRate, numPayments, monthlyPayment) {
+            let balance = loanAmount;
+            let totalInterestPaid = 0;
+            let totalPrincipalPaid = 0;
+            const rows = [];
+            
+            // Show first year monthly, then annual summary
+            for (let i = 1; i <= numPayments; i++) {
+                const interestPayment = balance * monthlyRate;
+                const principalPayment = monthlyPayment - interestPayment;
+                balance -= principalPayment;
+                totalInterestPaid += interestPayment;
+                totalPrincipalPaid += principalPayment;
+
+                // Only show first 12 months, then every 12th month
+                if (i <= 12 || i % 12 === 0) {
+                    const year = Math.ceil(i / 12);
+                    const rowClass = (i === numPayments) ? 'highlight-row' : '';
+                    rows.push(`
+                        <tr class="${rowClass}">
+                            <td>Month ${i} (Y${year})</td>
+                            <td class="text-right">${formatCurrency(monthlyPayment)}</td>
+                            <td class="text-right">${formatCurrency(Math.max(principalPayment, 0))}</td>
+                            <td class="text-right">${formatCurrency(interestPayment)}</td>
+                            <td class="text-right">${formatCurrency(Math.max(balance, 0))}</td>
+                        </tr>
+                    `);
+                }
+            }
+
+            // Calculate debt ratios including mortgage payment
+            const monthlyGrossIncome = window.calcData.annualGrossIncome / 12;
+            const gdsRatio = (monthlyPayment / monthlyGrossIncome) * 100;
+            const tdsRatio = ((monthlyPayment + window.calcData.monthlyFixedCosts) / monthlyGrossIncome) * 100;
+
+            document.getElementById('fixedPaymentBody').innerHTML = rows.join('');
+            const infoText = `
+                <strong>Monthly Payment:</strong> ${formatCurrency(monthlyPayment)} (Fixed)<br>
+                <strong>Total Interest Over ${numPayments / 12} Years:</strong> ${formatCurrency(totalInterestPaid)}<br>
+                <strong>Interest as % of Property Value:</strong> ${((totalInterestPaid / window.calcData.housePrice) * 100).toFixed(1)}%<br>
+                <br>
+                <strong>📊 Debt Service Ratios (Fixed Payment Method):</strong><br>
+                <strong>GDS Ratio:</strong> ${gdsRatio.toFixed(1)}% <span class="debt-ratio ${gdsRatio <= 33 ? 'good' : gdsRatio <= 40 ? 'caution' : 'danger'}">${gdsRatio <= 33 ? 'Good' : gdsRatio <= 40 ? 'Acceptable' : 'High'}</span><br>
+                <strong>TDS Ratio:</strong> ${tdsRatio.toFixed(1)}% <span class="debt-ratio ${tdsRatio <= 40 ? 'good' : tdsRatio <= 44 ? 'caution' : 'danger'}">${tdsRatio <= 40 ? 'Good' : tdsRatio <= 44 ? 'Acceptable' : 'High'}</span><br>
+                <small style="color: var(--color-text-secondary);">GDS = Mortgage only ÷ Income. TDS = (Mortgage + Fixed Costs €${window.calcData.monthlyFixedCosts.toFixed(2)}) ÷ Income</small>
+            `;
+            document.getElementById('fixedPaymentInfo').innerHTML = infoText;
+        }
+
+        function generateFixedPrincipalSchedule(loanAmount, monthlyRate, numPayments) {
+            const fixedPrincipal = loanAmount / numPayments;
+            let balance = loanAmount;
+            let totalInterestPaid = 0;
+            const rows = [];
+            let firstMonthPayment = fixedPrincipal + (loanAmount * monthlyRate);
+            let lastMonthPayment = fixedPrincipal + (fixedPrincipal * monthlyRate);
+
+            for (let i = 1; i <= numPayments; i++) {
+                const interestPayment = balance * monthlyRate;
+                const totalPayment = fixedPrincipal + interestPayment;
+                balance -= fixedPrincipal;
+                totalInterestPaid += interestPayment;
+
+                // Only show first 12 months, then every 12th month
+                if (i <= 12 || i % 12 === 0) {
+                    const year = Math.ceil(i / 12);
+                    const rowClass = (i === numPayments) ? 'highlight-row' : '';
+                    rows.push(`
+                        <tr class="${rowClass}">
+                            <td>Month ${i} (Y${year})</td>
+                            <td class="text-right">${formatCurrency(totalPayment)}</td>
+                            <td class="text-right">${formatCurrency(fixedPrincipal)}</td>
+                            <td class="text-right">${formatCurrency(interestPayment)}</td>
+                            <td class="text-right">${formatCurrency(Math.max(balance, 0))}</td>
+                        </tr>
+                    `);
+                }
+            }
+
+            // Calculate interest difference
+            const fixedPaymentMonthlyRate = window.calcData.interestRate / 100 / 12;
+            const fixedPaymentNumPayments = window.calcData.mortgageTerm * 12;
+            const fixedPaymentMonthly = loanAmount * (fixedPaymentMonthlyRate * Math.pow(1 + fixedPaymentMonthlyRate, fixedPaymentNumPayments)) / (Math.pow(1 + fixedPaymentMonthlyRate, fixedPaymentNumPayments) - 1);
+            const fixedPaymentTotalInterest = (fixedPaymentMonthly * fixedPaymentNumPayments) - loanAmount;
+            const interestSavings = fixedPaymentTotalInterest - totalInterestPaid;
+
+            // Calculate debt ratios for fixed principal method
+            const monthlyGrossIncome = window.calcData.annualGrossIncome / 12;
+            const avgMonthlyPayment = (firstMonthPayment + lastMonthPayment) / 2;
+            const gdsRatioFirst = (firstMonthPayment / monthlyGrossIncome) * 100;
+            const gdsRatioLast = (lastMonthPayment / monthlyGrossIncome) * 100;
+            const tdsRatioFirst = ((firstMonthPayment + window.calcData.monthlyFixedCosts) / monthlyGrossIncome) * 100;
+            const tdsRatioLast = ((lastMonthPayment + window.calcData.monthlyFixedCosts) / monthlyGrossIncome) * 100;
+
+            document.getElementById('fixedPrincipalBody').innerHTML = rows.join('');
+            const infoText = `
+                <strong>Fixed Principal Payment:</strong> ${formatCurrency(fixedPrincipal)} (Per Month)<br>
+                <strong>First Month Total:</strong> ${formatCurrency(firstMonthPayment)}<br>
+                <strong>Last Month Total:</strong> ${formatCurrency(lastMonthPayment)}<br>
+                <strong>Total Interest Over ${numPayments / 12} Years:</strong> ${formatCurrency(totalInterestPaid)}<br>
+                <strong>Interest Savings vs Fixed Payment:</strong> <span style="color: var(--color-success); font-weight: 600;">${formatCurrency(interestSavings)}</span><br>
+                <br>
+                <strong>📊 Debt Service Ratios (Fixed Principal Method):</strong><br>
+                <strong>GDS Ratio (Month 1):</strong> ${gdsRatioFirst.toFixed(1)}% <span class="debt-ratio ${gdsRatioFirst <= 33 ? 'good' : gdsRatioFirst <= 40 ? 'caution' : 'danger'}">${gdsRatioFirst <= 33 ? 'Good' : gdsRatioFirst <= 40 ? 'Acceptable' : 'High'}</span><br>
+                <strong>GDS Ratio (Last Month):</strong> ${gdsRatioLast.toFixed(1)}% <span class="debt-ratio ${gdsRatioLast <= 33 ? 'good' : gdsRatioLast <= 40 ? 'caution' : 'danger'}">${gdsRatioLast <= 33 ? 'Good' : gdsRatioLast <= 40 ? 'Acceptable' : 'High'}</span><br>
+                <strong>TDS Ratio (Month 1):</strong> ${tdsRatioFirst.toFixed(1)}% <span class="debt-ratio ${tdsRatioFirst <= 40 ? 'good' : tdsRatioFirst <= 44 ? 'caution' : 'danger'}">${tdsRatioFirst <= 40 ? 'Good' : tdsRatioFirst <= 44 ? 'Acceptable' : 'High'}</span><br>
+                <strong>TDS Ratio (Last Month):</strong> ${tdsRatioLast.toFixed(1)}% <span class="debt-ratio ${tdsRatioLast <= 40 ? 'good' : tdsRatioLast <= 44 ? 'caution' : 'danger'}">${tdsRatioLast <= 40 ? 'Good' : tdsRatioLast <= 44 ? 'Acceptable' : 'High'}</span><br>
+                <small style="color: var(--color-text-secondary);">Fixed Principal payments decrease monthly. Ratios shown for first and last months. GDS = Mortgage ÷ Income. TDS = (Mortgage + Fixed Costs €${window.calcData.monthlyFixedCosts.toFixed(2)}) ÷ Income</small>
+            `;
+            document.getElementById('fixedPrincipalInfo').innerHTML = infoText;
+        }
+
+        function generateAnalysis(monthlyPayment, monthlyGrossIncome, gdsRatio, tdsRatio, monthlyFixedCosts, totalInterest, loanAmount) {
+            const annualMortgage = monthlyPayment * 12;
+            const annualFixedCosts = monthlyFixedCosts * 12;
+            const totalAnnualDebt = annualMortgage + annualFixedCosts;
+            const annualGrossIncome = monthlyGrossIncome * 12;
+
+            const analysisHTML = `
+                <div class="metric-box" style="margin-bottom: 15px;">
+                    <div class="metric-label">Gross Debt Service Ratio (GDS)</div>
+                    <div class="metric-value ${gdsRatio > 40 ? 'error' : gdsRatio > 33 ? 'warning' : 'success'}">${gdsRatio.toFixed(1)}%</div>
+                    <div class="metric-note">
+                        Mortgage only. 
+                        <span class="debt-ratio ${gdsRatio <= 33 ? 'good' : gdsRatio <= 40 ? 'caution' : 'danger'}">
+                            ${gdsRatio <= 33 ? 'Good' : gdsRatio <= 40 ? 'Acceptable' : 'High'}
+                        </span>
+                    </div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Total Debt Service Ratio (TDS)</div>
+                    <div class="metric-value ${tdsRatio > 44 ? 'error' : tdsRatio > 40 ? 'warning' : 'success'}">${tdsRatio.toFixed(1)}%</div>
+                    <div class="metric-note">
+                        All debts included.
+                        <span class="debt-ratio ${tdsRatio <= 40 ? 'good' : tdsRatio <= 44 ? 'caution' : 'danger'}">
+                            ${tdsRatio <= 40 ? 'Good' : tdsRatio <= 44 ? 'Acceptable' : 'High'}
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('debtServiceAnalysis').innerHTML = analysisHTML;
+
+            // Generate insights
+            const insights = [];
+            
+            if (gdsRatio > 40) {
+                insights.push('⚠️ <strong>GDS exceeds recommended 33%</strong> - Your mortgage payment alone is very high relative to income. Consider larger down payment or lower-priced property.');
+            } else if (gdsRatio > 33) {
+                insights.push('⚠️ <strong>GDS is marginal (33-40%)</strong> - Within acceptable range for some lenders but leaves limited room for other expenses.');
+            } else {
+                insights.push('✅ <strong>GDS is healthy</strong> - Mortgage payment is manageable relative to income.');
+            }
+
+            if (tdsRatio > 44) {
+                insights.push('❌ <strong>TDS exceeds 44%</strong> - Total debt burden is very high. Lenders will likely reject this application.');
+            } else if (tdsRatio > 40) {
+                insights.push('⚠️ <strong>TDS is above 40%</strong> - You have limited financial flexibility. Reduce other debts or increase income.');
+            } else {
+                insights.push('✅ <strong>TDS is within limits</strong> - Good overall debt management.');
+            }
+
+            const ltv = (loanAmount / window.calcData.housePrice) * 100;
+            if (ltv > 90) {
+                insights.push('⚠️ <strong>LTV exceeds 90%</strong> - Very high leverage may require mortgage insurance.');
+            } else {
+                insights.push('✅ <strong>LTV is conservative</strong> - Good equity position at purchase.');
+            }
+
+            insights.push(`💡 <strong>Total Interest Cost:</strong> ${formatCurrency(totalInterest)} over the loan term.`);
+            
+            const insightHTML = insights.map(i => `<div style="margin-bottom: 12px; padding: 10px; background: #f5f5f5; border-radius: 4px; border-left: 3px solid var(--color-primary);">${i}</div>`).join('');
+            document.getElementById('insights').innerHTML = insightHTML;
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Initialize
+        calculateAll();
+    </script>
+</body>
+</html>
